@@ -1,0 +1,150 @@
+import tkinter as tk
+import turtle
+import math
+
+# -----------------------------
+# L-System Expansion Engine
+# -----------------------------
+def expand_lsystem(axiom, rules, iterations):
+    current = axiom
+    for _ in range(iterations):
+        next_string = []
+        for symbol in current:
+            next_string.append(rules.get(symbol, symbol))
+        current = "".join(next_string)
+    return current
+
+
+# -----------------------------
+# Turtle Command Interpreter
+# -----------------------------
+def draw_lsystem(t, commands, angle, step=5):
+    stack = []
+    length = len(commands)
+
+    turtle.tracer(0, 0)
+
+    for i, cmd in enumerate(commands):
+        ratio = i / length if length else 0
+        r = int(139 * ratio)
+        g = int(69 + (186 - 69) * (1 - ratio))
+        b = int(19 * ratio)
+        t.pencolor(r / 255, g / 255, b / 255)
+
+        if cmd == 'F':
+            t.forward(step)
+        elif cmd == '+':
+            t.right(angle)
+        elif cmd == '-':
+            t.left(angle)
+        elif cmd == '[':
+            stack.append((t.position(), t.heading()))
+        elif cmd == ']':
+            if stack:
+                pos, heading = stack.pop()
+                t.penup()
+                t.goto(pos)
+                t.setheading(heading)
+                t.pendown()
+
+    turtle.update()
+
+
+
+# -----------------------------
+# GUI Application
+# -----------------------------
+class LSystemApp:
+    def __init__(self, root):
+        self.root = root
+        root.title("L-System Visualizer (Tkinter + Turtle)")
+
+        # Layout
+        control_frame = tk.Frame(root)
+        control_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+        canvas_frame = tk.Frame(root)
+        canvas_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
+        # Canvas for Turtle
+        self.canvas = tk.Canvas(canvas_frame, width=800, height=600)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+
+        self.screen = turtle.TurtleScreen(self.canvas)
+        self.screen.bgcolor("white")
+
+        self.turtle = turtle.RawTurtle(self.screen)
+        self.turtle.hideturtle()
+        self.turtle.speed(0)
+        self.turtle.penup()
+        self.turtle.goto(0, -250)
+        self.turtle.pendown()
+
+        # Inputs
+        self.create_inputs(control_frame)
+
+
+        # Generate Button
+        tk.Button(
+            control_frame,
+            text="Generate",
+            command=self.generate,
+            bg="#4CAF50",
+            fg="white",
+            width=20
+        ).pack(pady=10)
+
+    def create_inputs(self, parent):
+        tk.Label(parent, text="Axiom:").pack(anchor="w")
+        self.axiom_entry = tk.Entry(parent, width=30)
+        self.axiom_entry.insert(0, "F")
+        self.axiom_entry.pack(pady=3)
+
+        tk.Label(parent, text="Rules (A:B, C:D):").pack(anchor="w")
+        self.rules_entry = tk.Entry(parent, width=30)
+        self.rules_entry.insert(0, "F:F[+F]F[-F]F")
+        self.rules_entry.pack(pady=3)
+
+        tk.Label(parent, text="Angle:").pack(anchor="w")
+        self.angle_entry = tk.Entry(parent, width=30)
+        self.angle_entry.insert(0, "25")
+        self.angle_entry.pack(pady=3)
+
+        tk.Label(parent, text="Iterations:").pack(anchor="w")
+        self.iter_entry = tk.Entry(parent, width=30)
+        self.iter_entry.insert(0, "4")
+        self.iter_entry.pack(pady=3)
+
+
+    def parse_rules(self, rule_text):
+        rules = {}
+        for rule in rule_text.split(","):
+            if ":" in rule:
+                key, value = rule.split(":")
+                rules[key.strip()] = value.strip()
+        return rules
+
+    def generate(self):
+        self.turtle.clear()
+        self.turtle.penup()
+        self.turtle.goto(0, -250)
+        self.turtle.setheading(90)
+        self.turtle.pendown()
+
+        axiom = self.axiom_entry.get()
+        rules = self.parse_rules(self.rules_entry.get())
+        angle = float(self.angle_entry.get())
+        iterations = int(self.iter_entry.get())
+
+        final_string = expand_lsystem(axiom, rules, iterations)
+        draw_lsystem(self.turtle, final_string, angle)
+
+
+
+# -----------------------------
+# Run Application
+# -----------------------------
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = LSystemApp(root)
+    root.mainloop()
