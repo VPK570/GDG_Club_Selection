@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Edit Task{% endblock %}
+
+{% block content %}
+<h2>Edit Task</h2>
+
+<form method="POST">
+    <input type="text" name="title" value="{{ task.title }}" required>
+
+    <textarea name="description">{{ task.description }}</textarea>
+
+    <select name="priority">
+        {% for p in ["Low","Medium","High"] %}
+        <option {% if task.priority == p %}selected{% endif %}>{{ p }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="status">
+        {% for s in ["Pending","In Progress","Completed"] %}
+        <option {% if task.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="date" name="deadline" value="{{ task.deadline }}">
+
+    <button type="submit">Update</button>
+</form>
+{% endblock %}

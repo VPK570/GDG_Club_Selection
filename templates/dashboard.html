@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<!-- Overview (secondary, not dominant) -->
+<div class="overview">
+    <div class="overview-card">
+        <span>Total</span>
+        <strong>{{ stats.total }}</strong>
+    </div>
+    <div class="overview-card">
+        <span>Completed</span>
+        <strong>{{ stats.completed }}</strong>
+    </div>
+    <div class="overview-card">
+        <span>Overdue</span>
+        <strong class="overdue">{{ stats.overdue }}</strong>
+    </div>
+</div>
+
+<hr>
+
+<!-- Task Actions -->
+<div class="task-header">
+    <h3>My Tasks</h3>
+    <a href="{{ url_for('create_task') }}" class="btn">+ New Task</a>
+</div>
+
+<!-- Filters -->
+<form method="GET" class="filters">
+    <select name="status">
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+    </select>
+
+    <select name="priority">
+        <option value="">All Priority</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
+    </select>
+
+    <input type="text" name="q" placeholder="Search tasks">
+    <button type="submit">Apply</button>
+</form>
+
+<!-- Task Table -->
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Deadline</th>
+        <th>Actions</th>
+    </tr>
+
+    {% for task in tasks %}
+    <tr class="{% if task.is_overdue %}overdue{% endif %}">
+        <td>{{ task.title }}</td>
+        <td>{{ task.status }}</td>
+        <td>{{ task.priority }}</td>
+        <td>{{ task.deadline }}</td>
+        <td>
+            <a href="{{ url_for('edit_task', task_id=task.id) }}">Edit</a>
+            <a href="{{ url_for('delete_task', task_id=task.id) }}">Delete</a>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="5">No tasks found.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<div class="dashboard-footer">
+    <a href="{{ url_for('analytics') }}">View Detailed Analytics →</a>
+</div>
+
+{% endblock %}
