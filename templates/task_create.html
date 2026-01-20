@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Create Task{% endblock %}
+
+{% block content %}
+<h2>Create Task</h2>
+
+<form method="POST">
+    <label>Title</label>
+    <input type="text" name="title" required>
+
+    <label>Description</label>
+    <textarea name="description"></textarea>
+
+    <label>Priority</label>
+    <select name="priority">
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+    </select>
+
+    <label>Status</label>
+    <select name="status">
+        <option>Pending</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+    </select>
+
+    <label>Deadline</label>
+    <input type="date" name="deadline" required>
+
+    <label>Tags (comma separated)</label>
+    <input type="text" name="tags">
+
+    <button type="submit">Create</button>
+</form>
+{% endblock %}
